@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页面</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-image: url('https://cdn.pixabay.com/photo/2017/02/12/12/42/wall-2059909_1280.png');
+            background-size: cover;
+            background-blend-mode: overlay;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+            padding-top: 50px;
+        }
+
+        /* 标题样式 */
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007BFF;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表单样式 */
+        form {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            box-sizing: border-box;
+            animation: fadeInUp 0.8s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 输入容器样式 */
+        .input-container {
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .input-container:hover {
+            transform: scale(1.02);
+        }
+
+        /* 标签样式 */
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        /* 输入框样式 */
+        input[type="email"],
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 18px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #007BFF;
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+            transform: scale(1.03);
+        }
+
+        /* 按钮样式 */
+        button {
+            width: 100%;
+            padding: 18px 25px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d80 100%);
+            transform: scale(1.07);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* 消息列表样式 */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+
+        /* 消息列表项样式 */
+        li {
+            color: red;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        /* 提示消息样式 */
+        #message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px 40px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        /* 切换登录方式提示样式 */
+        .switch-login {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .switch-login a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .switch-login a:hover {
+            text-decoration: underline;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <h2>仓库物料质量管理平台用户登录</h2>
+    <form action="{{ url_for('submit_login') }}" method="post" id="password-login">
+        <!-- 显示闪烁消息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- 用户名/邮箱 + 密码 登录方式 -->
+        <div class="input-container">
+            <label for="identifier">用户名/邮箱</label>
+            <input type="text" id="identifier" name="identifier" required>
+        </div>
+        <div class="input-container">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <input type="hidden" name="login_method" value="password">
+        <button type="submit">登录</button>
+        <div class="switch-login">
+            想使用验证码登录？<a href="#" onclick="showCodeLogin()">点击这里</a>
+        </div>
+    </form>
+
+    <form action="{{ url_for('submit_login') }}" method="post" id="code-login" style="display: none;">
+        <!-- 显示闪烁消息 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- 邮箱 + 验证码 登录方式 -->
+        <div class="input-container">
+            <label for="email">邮箱</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="input-container">
+            <button type="button" id="send-code-btn" onclick="sendVerificationCode()">发送验证码</button>
+        </div>
+        <div class="input-container">
+            <label for="verification-code">验证码</label>
+            <input type="text" id="verification-code" name="verification_code" required>
+        </div>
+        <input type="hidden" name="login_method" value="code">
+        <button type="submit">登录</button>
+        <div class="switch-login">
+            想使用密码登录？<a href="#" onclick="showPasswordLogin()">点击这里</a>
+        </div>
+    </form>
+
+    <div id="message"></div>
+
+    <script>
+        function sendVerificationCode() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                showMessage('请先输入邮箱地址');
+                return;
+            }
+            const sendBtn = document.getElementById('send-code-btn');
+            sendBtn.disabled = true;
+            let seconds = 60;
+            sendBtn.textContent = `${seconds} 秒后可重新发送`;
+            const timer = setInterval(() => {
+                seconds--;
+                if (seconds > 0) {
+                    sendBtn.textContent = `${seconds} 秒后可重新发送`;
+                } else {
+                    clearInterval(timer);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送验证码';
+                }
+            }, 1000);
+
+            const formData = new FormData();
+            formData.append('email', email);
+            fetch('/request_login_code', {
+                method: 'POST',
+                body: formData
+            })
+              .then(response => response.json())
+              .then(data => {
+                    showMessage(data.message);
+                    if (!data.success) {
+                        sendBtn.disabled = false;
+                        sendBtn.textContent = '发送验证码';
+                        clearInterval(timer);
+                    }
+                })
+              .catch((error) => {
+                    showMessage(`请求出错：${error.message}，请稍后重试`);
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送验证码';
+                    clearInterval(timer);
+                });
+        }
+
+        function showMessage(msg) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = msg;
+            messageDiv.style.opacity = 1;
+            setTimeout(() => {
+                messageDiv.style.opacity = 0;
+            }, 3000);
+        }
+
+        function showPasswordLogin() {
+            document.getElementById('code-login').style.display = 'none';
+            document.getElementById('password-login').style.display = 'block';
+        }
+
+        function showCodeLogin() {
+            document.getElementById('password-login').style.display = 'none';
+            document.getElementById('code-login').style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

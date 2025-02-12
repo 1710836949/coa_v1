@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册页面</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('https://cdn.pixabay.com/photo/2017/02/12/12/42/wall-2059909_1280.png');
+            background-size: cover;
+            background-blend-mode: overlay;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+            padding-top: 50px;
+        }
+
+        /* 标题样式 */
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #007BFF;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表单样式 */
+        form {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            box-sizing: border-box;
+            animation: fadeInUp 0.8s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 输入容器样式，用于将标签和输入框水平排列 */
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+        }
+
+        .input-container:hover {
+            transform: scale(1.02);
+        }
+
+        /* 标签样式 */
+        label {
+            font-size: 1.1rem;
+            color: #555;
+            font-weight: 500;
+            width: 25%;
+        }
+
+        /* 输入框样式 */
+        input {
+            width: 70%;
+            padding: 18px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+            transform: scale(1.03);
+        }
+
+        /* 验证码容器样式 */
+        .verification-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        /* 验证码输入框样式 */
+        .verification-input {
+            padding: 18px;
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* 按钮容器样式 */
+        .button-container {
+            display: flex;
+            gap: 25px;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        /* 主要按钮样式 */
+        .main-button {
+            padding: 18px 25px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            flex-grow: 1;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 鼠标悬停时按钮样式 */
+        .main-button:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d80 100%);
+            transform: scale(1.07);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 按钮按下时样式 */
+        .main-button:active {
+            transform: scale(0.95);
+        }
+
+        /* 消息列表样式 */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 25px;
+        }
+
+        /* 消息列表项样式 */
+        li {
+            color: red;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        /* 提示框样式 */
+        .alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px 40px;
+            background-color: #d4edda;
+            color: #155724;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            animation: fadeInOut 2s ease;
+            font-size: 1.1rem;
+        }
+
+        /* 错误提示框样式 */
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 成功提示框样式 */
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <h2>仓库物料质量管理平台用户注册</h2>
+    <!-- 显示闪烁消息 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('submit_registration') }}" method="post">
+        <!-- 用户名输入容器 -->
+        <div class="input-container">
+            <label for="username">用户名:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <!-- 密码输入容器 -->
+        <div class="input-container">
+            <label for="password">密码:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <!-- 邮箱输入容器 -->
+        <div class="input-container">
+            <label for="email">邮箱:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <!-- 验证码容器 -->
+        <div class="verification-container">
+            <div class="input-container">
+                <label for="verification_code">验证码:</label>
+                <input type="text" id="verification_code" name="verification_code" class="verification-input"
+                    placeholder="输入验证码" required>
+            </div>
+            <div class="button-container">
+                <button type="button" class="main-button" onclick="requestVerificationCode()">发送验证码</button>
+                <button type="submit" class="main-button">注册</button>
+            </div>
+        </div>
+    </form>
+    <div class="alert" id="messageAlert"></div>
+
+    <script>
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('messageAlert');
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+            alertBox.classList.add(type);
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+                alertBox.classList.remove(type);
+            }, 2000);
+        }
+
+        function requestVerificationCode() {
+            const emailInput = document.querySelector('#email');
+            const email = emailInput.value;
+            if (!email) {
+                showAlert('请先输入邮箱地址！', 'error');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('email', email);
+
+            fetch('/request_code', {
+                method: 'POST',
+                body: formData
+            })
+              .then(response => {
+                    if (response.ok) {
+                        showAlert('发送成功！', 'success');
+                        const sendButton = document.querySelector('.main-button[type="button"]');
+                        sendButton.disabled = true;
+                        let seconds = 60;
+                        sendButton.textContent = `${seconds}秒后重新发送`;
+                        const timer = setInterval(() => {
+                            seconds--;
+                            sendButton.textContent = `${seconds}秒后重新发送`;
+                            if (seconds <= 0) {
+                                clearInterval(timer);
+                                sendButton.disabled = false;
+                                sendButton.textContent = '发送验证码';
+                            }
+                        }, 1000);
+                    } else {
+                        showAlert('发送失败，请重试。', 'error');
+                    }
+                })
+              .catch(error => {
+                    showAlert('发生错误，请检查网络或稍后重试。', 'error');
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>

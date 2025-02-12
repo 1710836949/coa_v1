@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ material['material_name'] }} 质检报告</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 标题样式 */
+        h1 {
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 报告网格容器样式 */
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 报告项样式 */
+        .report-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .report-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .report-item a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .report-item a:hover {
+            text-decoration: underline;
+        }
+
+        /* 文件名样式 */
+        .filename {
+            color: #777;
+        }
+
+        /* 无报告提示样式 */
+        .no-reports {
+            text-align: center;
+            color: #777;
+            margin-top: 30px;
+        }
+
+        /* 返回按钮样式 */
+        .back-button {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        /* 图标样式 */
+        .file-icon {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        /* 导航按钮样式 */
+        .nav-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+        }
+
+        .nav-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* PDF 显示区域样式 */
+        #pdf-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>{{ material['material_name'] }} 质检报告</h1>
+    {% if reports %}
+    <div class="report-grid">
+        {% for report in reports|reverse %}
+        <div class="report-item">
+            {% set icon_names = ['图标1.png', '图标2.png'] %}
+            {% set random_icon = icon_names|random %}
+            <img src="{{ url_for('static', filename='icons/' + random_icon) }}" alt="File Icon" class="file-icon">
+            <a href="{{ url_for('view_quality_report', material_id=material['id'], report_index=loop.index0) }}">查看报告</a>
+            <span class="filename">{{ report['filename'] }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-reports">该物料暂无质检报告。</p>
+    {% endif %}
+    <a href="{{ url_for('user_dashboard') }}" class="back-button">返回仪表盘</a>
+
+    <!-- 如果正在查看某个报告，显示 PDF 容器和导航按钮 -->
+    {% if report_index is defined %}
+    <div id="pdf-container">
+        <iframe id="pdf-iframe" src="{{ url_for('download_report', report_path=reports[report_index]['report_path']) }}" width="80%" height="600px"></iframe>
+    </div>
+    <div style="text-align: center;">
+        {% if report_index > 0 %}
+        <a href="{{ url_for('view_quality_report', material_id=material['id'], report_index=report_index - 1) }}" class="nav-button">上一页</a>
+        {% endif %}
+        {% if report_index < reports|length - 1 %}
+        <a href="{{ url_for('view_quality_report', material_id=material['id'], report_index=report_index + 1) }}" class="nav-button">下一页</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+
+</html>

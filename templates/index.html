@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万华化学采购部化学品仓库物料COA共享平台</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 标题样式 */
+        h1 {
+            background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* 表单样式 */
+        form {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        input[type="text"] {
+            padding: 12px 15px;
+            width: 350px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="submit"] {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d80 100%);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 搜索提示样式 */
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.8rem;
+            color: #007BFF;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+            font-size: 1rem;
+        }
+
+        /* 物料列表样式 */
+        .material-grid {
+            display: grid;
+            /* 修改为一行显示 6 列 */
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 30px;
+            padding: 30px;
+            width: 90%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .material-item {
+            background-color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .material-item:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .material-item p {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #007BFF;
+            margin-bottom: 15px;
+        }
+
+        .material-item a {
+            color: #007BFF;
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 20px;
+            border: 2px solid #007BFF;
+            border-radius: 25px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .material-item a:hover {
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+        }
+
+        .material-item span {
+            color: #999;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>万华化学采购部化学品仓库物料COA共享平台</h1>
+    <form action="{{ url_for('user_search_materials') }}" method="get">
+        <input type="text" name="keyword" placeholder="搜索物料编码或名称">
+        <input type="submit" value="搜索">
+    </form>
+    <h2>物料列表</h2>
+    {% if search_keyword %}
+    <p>你搜索的关键词是: {{ search_keyword }}</p>
+    {% endif %}
+    {% if all_materials %}
+    <div class="material-grid">
+        {% set sorted_materials = [] %}
+        {% for material in all_materials %}
+            {% if material['id'] in permitted_material_ids %}
+                {% do sorted_materials.append(material) %}
+            {% endif %}
+        {% endfor %}
+        {% for material in all_materials %}
+            {% if material['id'] not in permitted_material_ids %}
+                {% do sorted_materials.append(material) %}
+            {% endif %}
+        {% endfor %}
+        {% for material in sorted_materials %}
+        <div class="material-item">
+            <p>{{ material['material_code'] }} - {{ material['material_name'] }}</p>
+            {% if material['id'] in permitted_material_ids %}
+            <!-- 修改链接指向报告列表页 -->
+            <a href="{{ url_for('report_list', material_id=material['id']) }}">查看质检报告</a>
+            {% else %}
+            <span>无权限访问</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>没有找到相关物料。</p>
+    {% endif %}
+</body>
+
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万华化学采购部化学品仓库物料COA共享平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* 左侧选择栏样式 */
+        .sidebar {
+            width: 220px;
+            background-color: #fff;
+            padding: 25px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar a i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar a:hover {
+            background-color: #e9f6ff;
+            color: #007BFF;
+        }
+
+        /* 右侧内容区域样式 */
+        .content {
+            flex: 1;
+            padding: 30px;
+            position: relative;
+        }
+
+        /* 登录用户信息样式 */
+        .user-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 0.9rem;
+        }
+
+        /* 表单样式 */
+        form {
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            padding: 25px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        input[type="file"]:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* 消息提示框样式 */
+        .message-box {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 9999;
+            max-width: 350px;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .message-box.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .message-box.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+
+        .message-box.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        #search-material {
+            margin-bottom: 12px;
+        }
+
+        #upload-options {
+            display: none;
+        }
+
+        /* 优化无匹配项提示样式 */
+        #no-results {
+            display: none;
+            color: red;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* 隐藏默认的内容区域 */
+        .content-section {
+            display: none;
+        }
+
+        /* 显示当前激活的内容区域 */
+        .content-section.active {
+            display: block;
+        }
+
+        /* 授权部分搜索输入框样式 */
+        #search-user {
+            margin-bottom: 12px;
+        }
+
+        /* 授权部分无匹配项提示样式 */
+        #no-results-user {
+            display: none;
+            color: red;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* 新的物料列表样式 */
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            padding: 25px;
+            width: 90%;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .material-item {
+            background-color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .material-item:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .material-item p {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #007BFF;
+            margin-bottom: 15px;
+        }
+
+        .material-item input[type="checkbox"] {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .material-item span {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        /* 选中物料框的样式 */
+        .material-item.selected {
+            background-color: #e0f7fa;
+            border: 2px solid #007BFF;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 左侧选择栏 -->
+    <div class="sidebar">
+        <ul>
+            <li><a href="#" data-target="upload-section"><i class="fas fa-upload"></i> 上传</a></li>
+            <li><a href="#" data-target="create-section"><i class="fas fa-folder-plus"></i> 新建物料文件夹</a></li>
+            <li><a href="#" data-target="permission-section"><i class="fas fa-user-lock"></i> 授权</a></li>
+        </ul>
+    </div>
+    <!-- 右侧内容区域 -->
+     <div class="content">
+        <!-- 登录用户信息 -->
+        <div class="user-info">
+            {% if username %}
+            欢迎，<span id="username">{{ username }}</span>
+            {% else %}
+            欢迎，请登录
+            {% endif %}
+        </div>
+        <h1 style="color: #333; font-weight: 700;">万华化学采购部化学品仓库物料COA共享平台</h1>
+
+        <!-- 显示消息提示 -->
+        <div class="flash-messages" style="display: none;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="{{ category }}" data-message="{{ message }}"></div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- 新建物料文件夹 -->
+        <div id="create-section" class="content-section">
+            <form action="{{ url_for('create_material_folder') }}" method="post" onsubmit="return validateCreateForm()">
+                <h2 style="color: #333; font-weight: 600;">新建物料文件夹</h2>
+                <label for="material_code">物料编码:</label>
+                <input type="text" id="material_code" name="material_code" required>
+                <label for="material_name">物料名称:</label>
+                <input type="text" id="material_name" name="material_name" required>
+                <input type="submit" value="创建">
+            </form>
+        </div>
+
+        <!-- 拍照上传质检报告 -->
+        <div id="upload-section" class="content-section">
+            <form action="{{ url_for('upload_quality_report') }}" method="post" enctype="multipart/form-data"
+                onsubmit="return validateUploadForm()">
+                <h2 style="color: #333; font-weight: 600;">拍照上传质检报告</h2>
+                <label for="search-material">搜索物料:</label>
+                <input type="text" id="search-material" placeholder="输入物料编码或名称进行搜索">
+                <p id="no-results">未找到匹配的物料</p>
+                <label for="material_id">选择物料:</label>
+                <select name="material_id" id="material_id" required>
+                    {% for material in materials %}
+                    <option value="{{ material.id }}" style="display: none;">{{ material.material_code }} - {{ material.material_name }}</option>
+                    {% endfor %}
+                </select>
+                <div id="upload-options">
+                    <label for="report_file_camera">拍照上传:</label>
+                    <input type="file" id="report_file_camera" name="report_file" accept="image/*" capture>
+                    <label for="report_file_desktop">从桌面选择文件上传:</label>
+                    <input type="file" id="report_file_desktop" name="report_file" accept="image/*">
+                </div>
+                <input type="submit" value="上传">
+            </form>
+        </div>
+
+        <!-- 给普通用户授权查看物料质检报告 -->
+        <div id="permission-section" class="content-section">
+            <form action="{{ url_for('set_user_permission') }}" method="post" onsubmit="return validatePermissionForm()">
+                <h2 style="color: #333; font-weight: 600;">给普通用户授权查看物料质检报告</h2>
+                <label for="search-user">搜索用户:</label>
+                <input type="text" id="search-user" placeholder="输入用户名进行搜索">
+                <p id="no-results-user">未找到匹配的用户</p>
+                <label for="user_id">选择用户:</label>
+                <select name="user_id" id="user_id" required>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" style="display: none;">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                <label for="search-material-permission">搜索物料:</label>
+                <input type="text" id="search-material-permission" placeholder="输入物料编码或名称进行搜索">
+                <p id="no-results-material-permission">未找到匹配的物料</p>
+                <!-- 全选复选框 -->
+                <label>
+                    <input type="checkbox" id="select-all"> 全选
+                </label>
+                <div class="material-grid" id="material-grid">
+                    {% for material in materials %}
+                    <div class="material-item">
+                        <p>{{ material.material_code }} - {{ material.material_name }}</p>
+                        <input type="checkbox" name="material_id_permission[]" value="{{ material.id }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="submit" value="授权">
+            </form>
+        </div>
+    </div>
+
+    <!-- 消息提示框容器 -->
+    <div id="message-container"></div>
+
+    <script>
+        const searchInput = document.getElementById('search-material');
+        const materialSelect = document.getElementById('material_id');
+        const uploadOptions = document.getElementById('upload-options');
+        const noResults = document.getElementById('no-results');
+
+        // 页面加载时清空选择
+        materialSelect.selectedIndex = -1;
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+            const options = materialSelect.options;
+            let hasMatch = false;
+            let exactMatch = false;
+
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                const text = option.textContent.trim().toLowerCase();
+                if (searchTerm === '' || text.includes(searchTerm)) {
+                    option.style.display = 'block';
+                    hasMatch = true;
+                    if (text === searchTerm) {
+                        option.selected = true;
+                        exactMatch = true;
+                        uploadOptions.style.display = 'block';
+                    }
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+
+            if (!exactMatch) {
+                uploadOptions.style.display = 'none';
+                materialSelect.selectedIndex = -1;
+            }
+
+            // 显示或隐藏无匹配项提示
+            noResults.style.display = hasMatch ? 'none' : 'block';
+        });
+
+        materialSelect.addEventListener('change', function () {
+            if (this.value) {
+                uploadOptions.style.display = 'block';
+            } else {
+                uploadOptions.style.display = 'none';
+            }
+        });
+
+        // 验证新建物料文件夹表单
+        function validateCreateForm() {
+            const materialCode = document.getElementById('material_code').value;
+            const materialName = document.getElementById('material_name').value;
+            if (materialCode.trim() === '' || materialName.trim() === '') {
+                alert('物料编码和物料名称不能为空');
+                return false;
+            }
+            return true;
+        }
+
+        // 验证拍照上传质检报告表单
+        function validateUploadForm() {
+            const materialId = document.getElementById('material_id').value;
+            const reportFileCamera = document.getElementById('report_file_camera').files[0];
+            const reportFileDesktop = document.getElementById('report_file_desktop').files[0];
+            if (materialId === '') {
+                alert('请选择物料');
+                return false;
+            }
+            if (!reportFileCamera && !reportFileDesktop) {
+                alert('请选择要上传的文件');
+                return false;
+            }
+            return true;
+        }
+
+        // 授权部分搜索用户功能
+        const searchUser = document.getElementById('search-user');
+        const userSelect = document.getElementById('user_id');
+        const noResultsUser = document.getElementById('no-results-user');
+
+        searchUser.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+            const options = userSelect.options;
+            let hasMatch = false;
+
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                const text = option.textContent.trim().toLowerCase();
+                if (searchTerm === '' || text.includes(searchTerm)) {
+                    option.style.display = 'block';
+                    hasMatch = true;
+                } else {
+                    option.style.display = 'none';
+                }
+            }
+
+            // 显示或隐藏无匹配项提示
+            noResultsUser.style.display = hasMatch ? 'none' : 'block';
+        });
+
+        // 授权部分搜索物料功能
+        const searchMaterialPermission = document.getElementById('search-material-permission');
+        const materialGrid = document.getElementById('material-grid');
+        const noResultsMaterialPermission = document.getElementById('no-results-material-permission');
+
+        searchMaterialPermission.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+            const materialItems = materialGrid.querySelectorAll('.material-item');
+            let hasMatch = false;
+
+            materialItems.forEach(item => {
+                const text = item.querySelector('p').textContent.trim().toLowerCase();
+                if (searchTerm === '' || text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    hasMatch = true;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // 显示或隐藏无匹配项提示
+            noResultsMaterialPermission.style.display = hasMatch ? 'none' : 'block';
+        });
+
+        // 验证给普通用户授权表单
+        function validatePermissionForm() {
+            const userId = document.getElementById('user_id').value;
+            const materialIdPermissions = document.querySelectorAll('input[name="material_id_permission[]"]:checked');
+            if (userId === '' || materialIdPermissions.length === 0) {
+                alert('请选择用户和至少一个物料');
+                return false;
+            }
+
+            const form = document.querySelector('form[action="{{ url_for('set_user_permission') }}"]');
+            const formData = new FormData(form);
+
+            fetch('{{ url_for('set_user_permission') }}', {
+                method: 'POST',
+                body: formData
+            })
+           .then(response => response.json())
+           .then(data => {
+                if (data.success) {
+                    showMessage('success', data.message);
+                } else {
+                    showMessage('error', data.message);
+                }
+            })
+           .catch(error => {
+                showMessage('error', '授权请求出错: ' + error.message);
+            });
+
+            return false; // 阻止表单默认提交
+        }
+
+        // 左侧选择栏点击事件处理
+        const sidebarLinks = document.querySelectorAll('.sidebar a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.dataset.target;
+                const contentSections = document.querySelectorAll('.content-section');
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                const targetSection = document.getElementById(targetId);
+                targetSection.classList.add('active');
+            });
+        });
+
+        // 默认显示上传部分
+        document.getElementById('upload-section').classList.add('active');
+
+        // 点击物料大框勾选和变色功能
+        const materialItems = document.querySelectorAll('.material-item');
+        materialItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    this.classList.add('selected');
+                } else {
+                    this.classList.remove('selected');
+                }
+                sortMaterialItems();
+            });
+
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', function () {
+                if (this.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+                sortMaterialItems();
+            });
+        });
+
+        // 全选功能
+        const selectAllCheckbox = document.getElementById('select-all');
+        selectAllCheckbox.addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('input[name="material_id_permission[]"]');
+            const materialItems = document.querySelectorAll('.material-item');
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = this.checked;
+                if (this.checked) {
+                    materialItems[index].classList.add('selected');
+                } else {
+                    materialItems[index].classList.remove('selected');
+                }
+            });
+            sortMaterialItems();
+        });
+
+        // 监听单个复选框变化，更新全选框状态
+        const individualCheckboxes = document.querySelectorAll('input[name="material_id_permission[]"]');
+        individualCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                const allChecked = Array.from(individualCheckboxes).every(cb => cb.checked);
+                selectAllCheckbox.checked = allChecked;
+            });
+        });
+
+        // 排序物料项函数
+        function sortMaterialItems() {
+            const materialGrid = document.getElementById('material-grid');
+            const materialItems = Array.from(materialGrid.querySelectorAll('.material-item'));
+            const checkedItems = [];
+            const uncheckedItems = [];
+
+            materialItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    checkedItems.push(item);
+                } else {
+                    uncheckedItems.push(item);
+                }
+            });
+
+            const sortedItems = [...checkedItems, ...uncheckedItems];
+            sortedItems.forEach(item => {
+                materialGrid.appendChild(item);
+            });
+        }
+
+        // 显示消息提示框
+        function showMessage(category, message) {
+            const messageContainer = document.getElementById('message-container');
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('message-box', category);
+            messageBox.textContent = message;
+            messageContainer.appendChild(messageBox);
+
+            // 显示消息框
+            setTimeout(() => {
+                messageBox.classList.add('show');
+            }, 100);
+
+            // 3 秒后自动隐藏消息框
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+                setTimeout(() => {
+                    messageContainer.removeChild(messageBox);
+                }, 300);
+            }, 3000);
+        }
+
+        // 页面加载时显示 flash 消息
+        document.addEventListener('DOMContentLoaded', function () {
+            const flashMessages = document.querySelectorAll('.flash-messages div');
+            flashMessages.forEach(message => {
+                const category = message.classList[0];
+                const msg = message.dataset.message;
+                showMessage(category, msg);
+            });
+        });
+    </script>
+</body>
+
+</html>
